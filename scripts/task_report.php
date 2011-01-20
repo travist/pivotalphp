@@ -38,7 +38,7 @@ function getOutput( &$pdf, $title, $stories ) {
         else {
           $notests .= '<li>';
           $notests .= '<a href="' . $story['url'] . '">' . $story['id'] . '</a>:';
-          $notests .= '&nbsp;&nbsp;<strong>' . $story['name'] . '</strong>';
+          $notests .= '&nbsp;&nbsp;' . $story['story_type'] . ':&nbsp;&nbsp;<strong>' . $story['name'] . '</strong>';
           $notests .= '</li>';
         }
       }
