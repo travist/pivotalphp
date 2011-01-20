@@ -74,14 +74,15 @@ function getConfig() {
       fwrite($handle, 'name=' . $config['name'] . "\n");
     }
 
-    if( !isset($config['username']) ) {
-      $config['username'] = getUserName();
-      fwrite($handle, 'username=' . $config['username'] . "\n");
-    }
-
-    if( !isset($config['password']) ) {
-      $config['password'] = getPassword();
-      fwrite($handle, 'password=' . $config['password'] . "\n");
+    // If there isn't a token...
+    if( !isset($config['token']) ) {
+      $username = getUserName();
+      $password = getPassword();
+      $output = shell_exec('curl -u ' . $username . ':' . $password . ' -X GET https://www.pivotaltracker.com/services/v3/tokens/active');
+      $matches = array();
+      preg_match('/\<guid\>([0-9a-zA-Z]+)\<\/guid\>/' , $output, $matches);
+      $config['token'] = $matches[1];
+      fwrite($handle, 'token=' . $config['token'] . "\n");
     }
 
     if( !isset($config['project']) ) {
@@ -126,7 +127,7 @@ function getPDF( $config, $title ) {
 
 function getStories( $config, $filter ) {
   // Now create a new PivotalTracker object.
-  $pivotal = new PivotalTracker(null, $config['username'], $config['password']);
+  $pivotal = new PivotalTracker($config['token']);
   $filter = isset($filter) ? 'label:"' . $filter . '"' : '';
   $filter .= 'includedone:true';
   return $pivotal->stories_get_by_filter($config['project'], $filter);
@@ -138,7 +139,7 @@ $filter = getFilter();
 $script = getScript();
 
 // Make sure we have everything.
-if ( $config['username'] && $config['password'] && $title && $script['selection']) {
+if ( $config['token'] && $config['project'] && $title && $script['selection']) {
 
   // Convert their selection to an integer.
   settype($script['selection'], "integer");
@@ -151,20 +152,22 @@ if ( $config['username'] && $config['password'] && $title && $script['selection'
     // Get the stories.
     $stories = getStories( $config, $filter );
 
-    // Include the script.
-    require_once($script['files'][($script['selection'] - 1)]);
+    if( $stories ) {
+      // Include the script.
+      require_once($script['files'][($script['selection'] - 1)]);
 
-    // Get the output from our script.
-    $output = getOutput( $pdf, $title, $stories );
+      // Get the output from our script.
+      pdf_contents( $pdf, $title, $stories );
 
-    // Now add the output to the PDF.
-    $pdf->writeHTML($output);
+      //Close and output PDF document
+      $pdf_output = $pdf->Output('doc.pdf', 'S');
 
-    //Close and output PDF document
-    $pdf_output = $pdf->Output('doc.pdf', 'S');
-
-    // Now write the contents to a file.
-    file_put_contents( $title . '.pdf', $pdf_output );
+      // Now write the contents to a file.
+      file_put_contents( $title . '.pdf', $pdf_output );
+    }
+    else {
+      echo "No stories found.";
+    }
   }
   else {
     echo "\nInvalid Selection.  Please Select a Number.";

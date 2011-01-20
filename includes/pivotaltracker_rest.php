@@ -11,14 +11,7 @@ class PivotalTracker {
   var $token = '';
   var $rest;
 
-  function __construct($token = null, $username = null, $password = null ) {
-    if( $username && $password ) {
-      $output = shell_exec("curl -u {$username}:{$password} -X GET https://www.pivotaltracker.com/services/v3/tokens/active");
-      $matches = array();
-      preg_match('/\<guid\>([0-9a-zA-Z]+)\<\/guid\>/' , $output, $matches);
-      $token = $matches[1];
-    }
-
+  function __construct($token = null) {
     $this->rest = new PivotalTrackerREST($token);
   }
 
