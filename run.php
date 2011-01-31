@@ -139,10 +139,10 @@ function getPDF($config, $title) {
   $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
   //set margins
-  $pdf->SetMargins(5, 5, 5);
+  $pdf->SetMargins(0, 0, 0);
 
   //set auto page breaks
-  $pdf->SetAutoPageBreak(TRUE, 5);
+  $pdf->SetAutoPageBreak(TRUE, 0);
 
   //set image scale factor
   $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);

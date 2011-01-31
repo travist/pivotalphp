@@ -3,53 +3,39 @@ function pdf_contents( &$pdf, $title, $stories ) {
   $i = 0;
 
   print_r($stories);
+  
+  $story_width = 98;
+  $story_height = 92;
+  $space = 5;
+  $num_rows = 3;
+  $num_cols = 2;
+
+  $pdf->setCellPaddings(2,2,2,2);
+  $pdf->setCellMargins(0,0,0,0);
 
   // Now Iterate through the stories.
   foreach ($stories as $story) {
 
     // Six cells per page.
-    $cell = ($i % 6);
-    $x = $y = 0;
-    switch( $cell ) {
-      case 0:
-        $x = 5;
-        $y = 5;
-        break;
-      case 1:
-        $x = 107;
-        $y = 5;
-        break;
-      case 2:
-        $x = 5;
-        $y = 92;
-        break;
-      case 3:
-        $x = 107;
-        $y = 92;
-        break;
-      case 4:
-        $x = 5;
-        $y = 179;
-        break;
-      case 5:
-        $x = 107;
-        $y = 179;
-        break;      
-    }
-
+    $cell = ($i % ($num_rows * $num_cols));
+    $col = $cell % $num_cols;
+    $row = floor($cell / $num_cols);
+    $x = $col*$story_width + (($col+1)*$space);
+    $y = $row*$story_height + (($row+1)*$space);
+    
     if( $cell == 0 ) {
       $pdf->AddPage();
     }
 
     // Write the title.
-    $pdf->SetFont('times', '', 10);
+    $pdf->SetFont('times', '', 14);
     $html = '<div>' . $story['id'] . ': <strong>' . $story['name'] . '</strong></div>';
-    $html .= (isset($story['description']) && $story['description']) ? '<div>' . $story['description'] . '</div>' : '';
+    $html .= (isset($story['description']) && $story['description']) ? '<div style="font-size:30px;">' . $story['description'] . '</div>' : '';
     
-    // Write the end of table.
-    $pdf->writeHTMLCell(100, 85, $x, $y, $html, 'LRTB', 1, false, true, 'L', true);
+    $pdf->writeHTMLCell($story_width, $story_height, $x, $y, $html, 'LRTB', 1, false, true, 'L', true);
 
     // Write the end of table.
+    $pdf->SetFont('times', '', 10);
     $pdf->Text($x, $y + 70, 'Type: ' . $story['story_type']);
     $pdf->Text($x + 35, $y + 70, 'Status: ' . $story['current_state']);
     $pdf->Text($x + 70, $y + 70, 'Points: ' . $story['estimate']);
