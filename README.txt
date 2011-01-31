@@ -1,9 +1,17 @@
 This script is a PHP-CLI that will create Pivotal PDF Documents.
 
-You can create new document formats by adding new PHP files in the scripts directory.  It should be self explanatory.
+Usage:
+  
+  Simply double click on the run.sh.  ( you must have PHP installed on your machine ).  Works for Mac and Unix systems.
 
-After that, simply click on the run.sh file to run the script.  It will walk you though some questions to generate your document.
+Adding new document formats:
 
-Contact me if you have any issues.  Enjoy!
+  This is designed to easily create new document formats.  Each document format is placed in a separate PHP file within the Scripts folder.
+  If you open up some of the previous examples in there, you should see how it works.
+
+
+Contact me if you have any issues.  travis at allplayers.com
+
+Enjoy!
 
 Travis.
