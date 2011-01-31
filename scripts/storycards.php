@@ -2,8 +2,6 @@
 function pdf_contents( &$pdf, $title, $stories ) {
   $i = 0;
 
-  print_r($stories);
-  
   $story_width = 98;
   $story_height = 92;
   $space = 5;
