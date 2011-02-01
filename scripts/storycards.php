@@ -1,5 +1,5 @@
 <?php
-function pdf_contents( &$pdf, $title, $stories ) {
+function pdf_contents( &$pdf, $args, $stories ) {
   $i = 0;
 
   $story_width = 98;
@@ -34,12 +34,30 @@ function pdf_contents( &$pdf, $title, $stories ) {
 
     // Write the end of table.
     $pdf->SetFont('times', '', 10);
-    $pdf->Text($x, $y + 70, 'Type: ' . $story['story_type']);
-    $pdf->Text($x + 35, $y + 70, 'Status: ' . $story['current_state']);
-    $pdf->Text($x + 70, $y + 70, 'Points: ' . $story['estimate']);
-    $pdf->Text($x, $y + 75, 'Labels: ' . $story['labels']);
-    $pdf->Text($x, $y + 80, 'Requester: ' . $story['requested_by']);
-    $pdf->Text($x + 60, $y + 80, 'Owner: ' . $story['owned_by']);
+
+    if( isset($story['story_type']) ) {
+      $pdf->Text($x, $y + 70, 'Type: ' . $story['story_type']);
+    }
+
+    if( isset($story['current_state']) ) {
+      $pdf->Text($x + 35, $y + 70, 'Status: ' . $story['current_state']);
+    }
+    
+    if( isset($story['estimate']) ) {
+      $pdf->Text($x + 70, $y + 70, 'Points: ' . $story['estimate']);
+    }
+
+    if( isset($story['labels']) ) {
+      $pdf->Text($x, $y + 75, 'Labels: ' . $story['labels']);
+    }
+
+    if( isset($story['requested_by']) ) {
+      $pdf->Text($x, $y + 80, 'Requester: ' . $story['requested_by']);
+    }
+    
+    if( isset($story['owned_by']) ) {
+      $pdf->Text($x + 60, $y + 80, 'Owner: ' . $story['owned_by']);
+    }
 
     if( $cell == 5 ) {
       $pdf->lastPage();

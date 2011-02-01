@@ -1,5 +1,5 @@
 <?php
-function pdf_contents( &$pdf, $title, $stories ) {
+function pdf_contents( &$pdf, $args, $stories ) {
   // Set the font of our PDF.
   $pdf->SetFont('times', 'B', 12);
 
@@ -8,7 +8,7 @@ function pdf_contents( &$pdf, $title, $stories ) {
 
   $output = '<html><body>';
 
-  $output .= '<h1>' . $title . '</h2>';
+  $output .= '<h1>' . $args['title'] . '</h2>';
 
   $tests = '';
   $notests = '<ul>';

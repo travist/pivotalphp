@@ -1,5 +1,5 @@
 <?php
-function pdf_contents( &$pdf, $title, $stories ) {
+function pdf_contents( &$pdf, $args, $stories ) {
   // Set the font of our PDF.
   $pdf->SetFont('times', 'B', 12);
 
