@@ -42,7 +42,7 @@ function getScript() {
     $i++;
   }
   $input = $cli->get("script", $output);
-  if (is_numeric($input) && $input < count($files)) {
+  if (is_numeric($input) && $input <= count($files)) {
     $keys = array_keys($files);
     return $keys[($input - 1)];
   }
