@@ -21,17 +21,20 @@ function pdf_contents( &$pdf, $args, $stories ) {
       $total++;
       if ( isset($story['tasks']) && count($story['tasks']) > 0) {
         $test_count++;
-        $tests .= '<p>';
         $tests .= '<a href="' . $story['url'] . '">' . $story['id'] . '</a>:';
         $tests .= '&nbsp;&nbsp;' . $story['story_type'] . ':&nbsp;&nbsp;<strong>' . $story['name'] . '</strong>';
         $tests .= '<ol>';
         foreach ($story['tasks'] as $tasks) {
-          foreach ($tasks as $task) {
-            $tests .= '<li>' . $task['description'] . '</li>';
+          if( is_array($tasks) ) {
+            foreach ($tasks as $task) {
+              $tests .= '<li>' . $task['description'] . '</li>';
+            }
+          }
+          else {
+            $tests .= '<li>' . $tasks['description'] . '</li>';
           }
         }
         $tests .= '</ol>';
-        $tests .= '</p>';
       }
       else {
         $notests .= '<li>';
