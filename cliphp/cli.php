@@ -54,9 +54,12 @@ class CLIPHP {
     $this->args[$name] = $value;
   }
 
-  public function get( $name, $output, $cache = FALSE ) {
+  public function get( $name, $output, $cache = FALSE,$lf = FALSE ) {
     if (!isset($this->args[$name])) {
-      echo $output . "\n";
+      echo $output;
+      if ($lf) {
+        echo "\n";
+      }
       $this->set( $name, $this->read(), $cache );
     }
     return $this->args[$name];
