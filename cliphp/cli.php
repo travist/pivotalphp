@@ -8,7 +8,7 @@ class CLIPHP {
     set_time_limit(0);
 
     // Try the config file first.
-    $handle = fopen('config', 'a+');
+    $handle = fopen( dirname(__FILE__) . '/config', 'a+');
     if ($handle) {
       while (($buffer = fgets($handle, 4096)) !== false) {
         $values = explode('=', $buffer);
@@ -38,7 +38,7 @@ class CLIPHP {
   }
 
   public function cache( $name, $value ) {
-    $handle = fopen('config', 'a+');
+    $handle = fopen( dirname(__FILE__) . '/config', 'a+');
     if ($handle) {
       fwrite($handle, $name . '=' . $value . "\n");
       fclose($handle);
