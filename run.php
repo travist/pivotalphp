@@ -145,7 +145,7 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
     require_once($files[$cli->args['script']]);
 
     // Get the output from our script.
-    pdf_contents($pdf, $cli->args['title'], $stories);
+    pdf_contents($pdf, $cli->args, $stories);
 
     //Close and output PDF document
     $pdf_output = $pdf->Output('doc.pdf', 'S');

@@ -25,13 +25,13 @@ function pdf_contents( &$pdf, $args, $stories ) {
         $tests .= '&nbsp;&nbsp;' . $story['story_type'] . ':&nbsp;&nbsp;<strong>' . $story['name'] . '</strong>';
         $tests .= '<ol>';
         foreach ($story['tasks'] as $tasks) {
-          if( is_array($tasks) ) {
+          if( isset($tasks['description']) ) {
+            $tests .= '<li>' . $tasks['description'] . '</li>';
+          }
+          else {
             foreach ($tasks as $task) {
               $tests .= '<li>' . $task['description'] . '</li>';
             }
-          }
-          else {
-            $tests .= '<li>' . $tasks['description'] . '</li>';
           }
         }
         $tests .= '</ol>';
