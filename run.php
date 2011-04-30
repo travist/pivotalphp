@@ -81,7 +81,16 @@ function getToken() {
  */
 function getPDF($args) {
   // create new PDF document
-  $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+  global $cli;
+
+  //landscape for bullet_list
+  if ($cli->args['script'] == "bullet_list.php") {
+    $pdf = new TCPDF("L", PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+  }
+  else {
+    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+  }
+
 
   // set document information
   $pdf->SetCreator($args['name']);
@@ -143,6 +152,27 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
 
     // Include the script.
     require_once($files[$cli->args['script']]);
+
+    // counts for stories
+    //var_dump($stories);
+    //exit();
+
+    //counts for stories
+    $type_cnt = array('bug'=>0,'feature'=>0,'release'=>0);
+    foreach ($stories as $story) {
+      if ($story['story_type']) {
+        $type_cnt[$story['story_type']]++;
+      }    
+    }
+
+    //var_dump($type_cnt);
+    $msg = "---------------\nTOTALS:\n";
+    foreach ($type_cnt as $type => $type_count) {
+      $msg .= sprintf ("   %-15.15s : %4d\n",$type."(s)",$type_count);
+    } 
+    $msg .=  "---------------\n";
+
+    print $msg;
 
     // Get the output from our script.
     pdf_contents($pdf, $cli->args, $stories);
