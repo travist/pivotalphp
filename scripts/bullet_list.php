@@ -1,6 +1,7 @@
 <?php
 function pdf_contents( &$pdf, $args, $stories ) {
   global $type_cnt;
+  global $est_cnt;
   // Set the font of our PDF.
 //  $pdf->SetFont('times', 'B', 12);
   //fixed space font for bullet spacing
@@ -12,7 +13,8 @@ function pdf_contents( &$pdf, $args, $stories ) {
 
   $output = '<html><body>';
 
-  $output .= '<h2>' . count($stories) . ' total stories</h2>';
+  $output .= '<h2>' . count($stories) . ' total stories with ';
+  $output .=  $est_cnt . ' estimated points.</h2>';
 
   //$type_cnt = array('bug'=>0,'feature'=>0,'release'=>0);
 

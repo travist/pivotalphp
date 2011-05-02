@@ -159,9 +159,13 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
 
     //counts for stories
     $type_cnt = array('bug'=>0,'feature'=>0,'release'=>0);
+    $est_cnt = 0;
     foreach ($stories as $story) {
       if ($story['story_type']) {
         $type_cnt[$story['story_type']]++;
+	if ($story['estimate'] > 0) {
+          $est_cnt = $est_cnt + $story['estimate'];
+        }
       }    
     }
 
@@ -170,6 +174,8 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
     foreach ($type_cnt as $type => $type_count) {
       $msg .= sprintf ("   %-15.15s : %4d\n",$type."(s)",$type_count);
     } 
+    $msg .=  "---------------\n";
+    $msg .=  "estimate total:$est_cnt\n";
     $msg .=  "---------------\n";
 
     print $msg;
