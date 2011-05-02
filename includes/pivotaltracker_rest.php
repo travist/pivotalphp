@@ -183,6 +183,8 @@ class PivotalTrackerREST {
 
     $fields = (is_array($vars)) ? http_build_query($vars) : $vars;
 
+print "URL:$url\n";
+
     $ch = curl_init($url);
 
     // Follow redirects

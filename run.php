@@ -127,10 +127,10 @@ function getPDF($args) {
 function getStories($args) {
   // Now create a new PivotalTracker object.
   $pivotal = new PivotalTracker($args['token']);
-  $filter = isset($filter) ? 'label:"' . $args['filter'] . '"' : '';
-  $filter .= 'includedone:true';
+  $args['filter'] = isset($args['filter']) ? 'label:"' . $args['filter'] . '"' : '';
+  $args['filter'] .= 'includedone:true';
   return $pivotal->stories_get_by_filter($args['project'], $args['filter']);
-}
+ }
 
 $cli->get("name", "Enter your full name. ( You will only need to do this once ):", TRUE);
 $cli->set("token", getToken(), TRUE);

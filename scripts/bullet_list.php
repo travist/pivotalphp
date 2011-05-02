@@ -18,7 +18,7 @@ function pdf_contents( &$pdf, $args, $stories ) {
 
 $output .= "<table border=\"2\" cellpadding=\"5\"><tr>";
 // printing table headers
-$output .= "<th bgcolor=\"#0000FF\">TYPE</th><th bgcolor=\"#0000FF\">COUNT</th>";
+$output .= "<th bgcolor=\"#00FFFF\">TYPE</th><th bgcolor=\"#00FFFF\">COUNT</th>";
 $output .= "</tr>\n";
 
 // do each row
