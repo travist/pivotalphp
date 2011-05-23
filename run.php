@@ -159,8 +159,6 @@ function getPDF($args) {
 function getStories($args) {
   // Now create a new PivotalTracker object.
   $pivotal = new PivotalTracker($args['token']);
-  $args['filter'] = isset($args['filter']) ? 'label:"' . $args['filter'] . '"' : '';
-  $args['filter'] .= 'includedone:true';
   return $pivotal->stories_get_by_filter($args['project'], $args['filter']);
  }
 
