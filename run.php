@@ -199,6 +199,7 @@ else
 }
 
 $cli->get("filter", "Filter: ");
+$cli->set("filter", str_replace(" ","%20",$cli->args['filter']));
 $cli->set("script", getScript());
 
 // Make sure we have everything.
