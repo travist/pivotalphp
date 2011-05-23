@@ -1,0 +1,5 @@
+	When prompted to retrieve stories by filter, you will come to a sections that requires you to add a filter to the search query.  This list of search filters can be found at:
+
+https://www.pivotaltracker.com/help#howcanasearchberefined
+
+	Use these filters to search through the data.  You should delimit each filter by a space, an HTML space (%20), or nothing.
