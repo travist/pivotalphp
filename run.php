@@ -176,7 +176,6 @@ if(isset($cli->args['project1']))
 	//Projects exist
     echo "Select from the following list (1,2,etc), or type a new Project ID\n";
     $temp = 1;
-    
     //List projects
     while(isset($cli->args['project'.$temp]))
     {
