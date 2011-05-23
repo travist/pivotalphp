@@ -53,6 +53,38 @@ function getScript() {
   }
 }
 
+/*
+ * Prompts for something silently
+ * Should work on UNIX/DOS
+ * 
+ * http://blogs.sitepoint.com/interactive-cli-password-prompt-in-php/
+ */
+function prompt_silent($prompt = "Enter Password:") {
+  if (preg_match('/^win/i', PHP_OS)) {
+    $vbscript = sys_get_temp_dir() . 'prompt_password.vbs';
+    file_put_contents(
+      $vbscript, 'wscript.echo(InputBox("'
+      . addslashes($prompt)
+      . '", "", "password here"))');
+    $command = "cscript //nologo " . escapeshellarg($vbscript);
+    $password = rtrim(shell_exec($command));
+    unlink($vbscript);
+    return $password;
+  } else {
+    $command = "/usr/bin/env bash -c 'echo OK'";
+    if (rtrim(shell_exec($command)) !== 'OK') {
+      trigger_error("Can't invoke bash");
+      return;
+    }
+    $command = "/usr/bin/env bash -c 'read -s -p \""
+      . addslashes($prompt)
+      . "\" mypassword && echo \$mypassword'";
+    $password = rtrim(shell_exec($command));
+    echo "\n";
+    return $password;
+  }
+}
+
 /**
  * Get's your pivotal tracker token.
  * 
@@ -65,7 +97,7 @@ function getToken() {
   }
   else {
     $username = $cli->get("username", "Enter your Pivotal Tracker user name. ( You will only need to do this once ):");
-    $password = $cli->get("password", "Enter you Pivotal Tracker password. ( You will only need to do this once ):");
+    $password = prompt_silent("Enter you Pivotal Tracker password. ( You will only need to do this once ):");
     $output = shell_exec('curl -u ' . $username . ':' . $password . ' -X GET https://www.pivotaltracker.com/services/v3/tokens/active');
     $matches = array();
     preg_match('/\<guid\>([0-9a-zA-Z]+)\<\/guid\>/', $output, $matches);
@@ -125,8 +157,38 @@ function getStories($args) {
 
 $cli->get("name", "Enter your full name. ( You will only need to do this once ):", TRUE);
 $cli->set("token", getToken(), TRUE);
-$cli->get("project", "Enter you Pivotal Tracker project ID. ( You will only need to do this once ):", TRUE);
-$cli->get("title", "Title: ");
+
+//CODE MODIFIED - Rowdy
+if(isset($cli->args['project1']))
+{
+    echo "Select from the following list (1,2,etc), or type a new Project ID\n";
+    $temp = 1;
+    while(isset($cli->args['project'.$temp]))
+    {
+        echo "  ".$temp.". ".$cli->args['title'.$temp].' - '.$cli->args['project'.$temp]."\n";
+        $temp++;
+    }
+    $cli->get('project', 'Selection: ');
+    if(isset($cli->args['project'.$cli->args['project']]))
+    {
+        $cli->set('title', $cli->args['title'.$cli->args['project']]);
+        $cli->set('project',$cli->args['project'.$cli->args['project']]);
+    }
+    else
+    {
+        $cli->get('title'.$temp, "Title: ", TRUE);
+        $cli->set('title', $cli->args['title'.$temp]);
+        $cli->set('project'.$temp, $cli->args['project'], TRUE);
+    }
+}
+else
+{
+    $cli->get("project1", "No Pivotal Tracker Project ID found\nEnter your PT PID:", TRUE);
+    $cli->set("project", $cli->args['project1']);
+    $cli->get("title1", "Title: ",TRUE);
+    $cli->set("title", $cli->args['title1']);
+}
+
 $cli->get("filter", "Filter: ");
 $cli->set("script", getScript());
 
