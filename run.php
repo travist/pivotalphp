@@ -203,7 +203,7 @@ else
 }
 
 $cli->get("filter", "Filter: ");
-$cli->set("filter", str_replace(" ","%20",$cli->args['filter']));
+$cli->set("filter", urlencode($cli->args['filter']));
 $cli->set("script", promptUserChoice("Select an output script:\n", "script", $files));
 $sortOrders = array('story_type' => 'Story type', 'estimate' => 'Estimate', 'requested_by' => 'Requested by', 'owned_by' => 'Owned by', 'current_state' => 'Current state', 'none' => 'None');
 $formats = array('HTML' => 'HTML', 'PDF' => 'PDF');
