@@ -150,6 +150,7 @@ function getPDF($args) {
 function getStories($args) {
   // Now create a new PivotalTracker object.
   $pivotal = new PivotalTracker($args['token']);
+  echo $args['filter'] . "\n";
   return $pivotal->stories_get_by_filter($args['project'], $args['filter']);
 }
 
@@ -188,7 +189,7 @@ else
 }
 
 $cli->get("filter", "Filter: ");
-$cli->set("filter", str_replace(" ","%20",$cli->args['filter']));
+$cli->set("filter", urlencode($cli->args['filter']));
 $cli->set("script", getScript());
 
 // Make sure we have everything.
