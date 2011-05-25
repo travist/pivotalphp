@@ -22,85 +22,45 @@ if (is_dir($dir)) {
         $path = $dir . DIRECTORY_SEPARATOR . $node;
         $ext = strtolower(substr($node, strrpos($node, '.') + 1));
         if ($ext == 'php' && !is_dir($path) && $node != 'storycards_html.php') {
-          $files[$node] = $path;
+          $files[$path] = $node;
         }
       }
     }
   }
 }
 
+
+function promptUserChoice( $prompt, $arg, $options )
+{
+  global $cli;
+  
+  $i = 1;
+  foreach($options as $option => $o)
+  {
+    $prompt .= '    ' . $i . ') ' . $o . "\n";
+    $i++;
+  }
+  
+  $input = $cli->get($arg, $prompt);
+  if (is_numeric($input) && $input <= count($options))
+  {
+    $keys = array_keys($options);
+    return $keys[($input - 1)];
+  }
+  else
+  {
+    echo "Invalid input here.  Please try again.\n";
+    return 0;
+  }
+}
+
+
 /**
  * Get's which script to run.
  * 
  * @return <type>
  */
-function getScript() {
-  global $cli, $files;
-  $i = 1;
-  $output = "Select an output script:\n";
-  foreach ($files as $file => $path) {
-    $output .= '    ' . $i . ') ' . $file . "\n";
-    $i++;
-  }
-  $input = $cli->get("script", $output);
-  if (is_numeric($input) && $input <= count($files)) {
-    $keys = array_keys($files);
-    return $keys[($input - 1)];
-  }
-  else {
-    echo "Invalid input.  Please try again.\n";
-    return 0;
-  }
-}
 
-function getFormat() {
-  global $cli;
-  $formats = array();
-  $formats[0] = 'HTML';
-  $formats[1] = 'PDF';
-  $output = "Select an output format:\n";
-  
-  $i = 1;
-  foreach ($formats as $format => $f)
-  {
-    $output .= '    ' . $i . ') ' . $f . "\n";
-    $i++;
-  }
-  $input = $cli->get("html", $output);
-  if (is_numeric($input) && $input <= count($formats)) 
-  {
-    return $input;
-  }
-  else
-  {
-    echo "Invalid input.  Please try again....\n";
-    return 0;
-  }
-}
-
-function getSortOrder()
-{
-  global $cli;
-  $sortOrders = array('story_type', 'estimate', 'requested_by', 'owned_by', 'current_state', 'none');
-  $output = "Select sort order:\n";
-  
-  $i = 1;
-  foreach ($sortOrders as $sortOrder => $s)
-  {
-    $output .= '    ' . $i . ')' . $s . "\n";
-    $i++;
-  }
-  $input = $cli->get("sortOrder", $output);
-  if (is_numeric($input) && $input <= count($sortOrders))
-  {
-    return $sortOrders[($input - 1)];
-  }
-  else
-  {
-    echo "Invalid input.  Please try again....\n";
-    return 0;
-  }
-}
 
 /**
  * Get's your pivotal tracker token.
@@ -186,9 +146,12 @@ $cli->set("token", getToken(), TRUE);
 $cli->get("project", "Enter you Pivotal Tracker project ID. ( You will only need to do this once ):", TRUE);
 $cli->get("title", "Title: ");
 $cli->get("filter", "Filter: ");
-$cli->set("script", getScript());
-$cli->set("html", getFormat());
-$cli->set("sortOrder", getSortOrder());
+
+$cli->set("script", promptUserChoice("Select an output script:\n", "script", $files));
+$sortOrders = array('story_type' => 'Story type', 'estimate' => 'Estimate', 'requested_by' => 'Requested by', 'owned_by' => 'Owned by', 'current_state' => 'Current state', 'none' => 'None');
+$formats = array('HTML' => 'HTML', 'PDF' => 'PDF');
+$cli->set("html", promptUserChoice("Select an output format:\n", "html", $formats));
+$cli->set("sortOrder", promptUserChoice("Select a sort order:\n", "sortOrder", $sortOrders));
 
 // Make sure we have everything.
 if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli->args['script']) {
@@ -202,7 +165,8 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
   if ($stories) {
 
     // Include the script.
-    require_once($files[$cli->args['script']]);
+    echo "Source File: " . $cli->args['script'] . "\n";
+    require_once($cli->args['script']);
 
     // counts for stories
     //var_dump($stories);
@@ -244,44 +208,44 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
 
     print $msg;
 
-  	$msg2 = sprintf ("Script Type: %s\n", $cli->args['script']);
-	  print $msg2;
+    $msg2 = sprintf ("Script Type: %s\n", $cli->args['script']);
+    print $msg2;
 	  
-	  //Sorts the stories by the user's choice
-	  $sortBy = array();
-	  $requested_by = array();
-	  $sortChoice = $cli->args['sortOrder'];
-	  $msg3 = sprintf ("Will sort by %s\n", $sortChoice);
-	  print $msg3;
+    //Sorts the stories by the user's choice
+    $sortBy = array();
+    $requested_by = array();
+    $sortChoice = $cli->args['sortOrder'];
+    $msg3 = sprintf ("Will sort by %s\n", $sortChoice);
+    print $msg3;
 	  
-	  foreach($stories as $key => $item)
-	  {
-	    $sortBy[$key] = $item[$sortChoice];
-	    $requested_by[$key] = $item['requested_by'];
-	  }
+    foreach($stories as $key => $item)
+    {
+      $sortBy[$key] = $item[$sortChoice];
+      $requested_by[$key] = $item['requested_by'];
+    }
 	  
-	  //For each sort, the requester is used as the secondary sort key for more order
-	  //Estimate is sorted descending, so that the most important stories are first
-	  if ($sortChoice == 'estimate')
-	  {
-	    array_multisort($sortBy, SORT_DESC, $requested_by, SORT_ASC, $stories);
-	  }
-	  else
-	  {
-	    array_multisort($sortBy, SORT_ASC, $requested_by, SORT_ASC, $stories);
+    //For each sort, the requester is used as the secondary sort key for more order
+    //Estimate is sorted descending, so that the most important stories are first
+    if ($sortChoice == 'estimate')
+    {
+      array_multisort($sortBy, SORT_DESC, $requested_by, SORT_ASC, $stories);
+    }
+    else
+    {
+      array_multisort($sortBy, SORT_ASC, $requested_by, SORT_ASC, $stories);
     }
 	  
 	  
-	  $output = '';
+    $output = '';
     
     //Outputs as HTML
-	  if ($cli->args['html'] == 1)
-	  {
-	    print "Will be in HTML\n";
-	    $filename = $cli->args['title'] . '.html';
-	    if ($cli->args['script'] != 'storycards.php')
-	    {
-  	    pdf_contents($pdf, $cli->args, $stories, $output);
+    if ($cli->args['html'] == 'HTML')
+    {
+      print "Will be in HTML\n";
+      $filename = $cli->args['title'] . '.html';
+      if ($cli->args['script'] != 'storycards.php')
+      {
+        pdf_contents($pdf, $cli->args, $stories, $output);
       }
       else
       {
@@ -290,20 +254,20 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
       }
       file_put_contents( dirname(__FILE__) . '/' . $filename, $output);
       echo "Successfully created " . $filename . "!\n";
-	  }
+    }
 	  
-	  //Outputs as a PDF
-	  else
-	  {
-	    print "Will be a PDF\n";
-	    pdf_contents($pdf, $cli->args, $stories, $output);
-	    $pdf->writeHTML($output);
-	    $pdf_output = $pdf->Output('doc.pdf', 'S');
+    //Outputs as a PDF
+    else
+    {
+      print "Will be a PDF\n";
+      pdf_contents($pdf, $cli->args, $stories, $output);
+      $pdf->writeHTML($output);
+      $pdf_output = $pdf->Output('doc.pdf', 'S');
 	    
-	    $filename = $cli->args['title'] . '.pdf';
+      $filename = $cli->args['title'] . '.pdf';
       file_put_contents( dirname(__FILE__) . '/' . $filename, $pdf_output);
       echo "Successfully created " . $filename . "!\n";
-	  }
+    }
 	  
   }
   else {

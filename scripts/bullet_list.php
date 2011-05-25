@@ -155,8 +155,5 @@ $output .= '<ul>';
 
   // Close out the body.
   $output .= '</body></html>';
-
-  // Write the HTML to this page.
-  //$pdf->writeHTML($output);
 }
 ?>
