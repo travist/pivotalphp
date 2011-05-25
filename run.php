@@ -30,6 +30,12 @@ if (is_dir($dir)) {
 }
 
 
+/**
+ * Presents a list of options to the user, and returns their choice
+ * 
+ * @return <type>
+ */
+
 function promptUserChoice( $prompt, $arg, $options )
 {
   global $cli;
@@ -53,14 +59,6 @@ function promptUserChoice( $prompt, $arg, $options )
     return 0;
   }
 }
-
-
-/**
- * Get's which script to run.
- * 
- * @return <type>
- */
-
 
 /**
  * Get's your pivotal tracker token.
