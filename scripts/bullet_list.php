@@ -1,5 +1,5 @@
 <?php
-function pdf_contents( &$pdf, $args, $stories ) {
+function pdf_contents( &$pdf, $args, $stories, &$output ) {
   global $type_cnt;
   global $est_cnt;
   global $est_type_cnt;
@@ -157,6 +157,6 @@ $output .= '<ul>';
   $output .= '</body></html>';
 
   // Write the HTML to this page.
-  $pdf->writeHTML($output);
+  //$pdf->writeHTML($output);
 }
 ?>

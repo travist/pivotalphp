@@ -1,5 +1,5 @@
 <?php
-function pdf_contents( &$pdf, $args, $stories ) {
+function pdf_contents( &$pdf, $args, $stories, &$output ) {
   // Set the font of our PDF.
   $pdf->SetFont('times', 'B', 12);
 
@@ -62,6 +62,6 @@ function pdf_contents( &$pdf, $args, $stories ) {
   $output .= '</body></html>';
 
   // Write the HTML to this page.
-  $pdf->writeHTML($output);
+  //$pdf->writeHTML($output);
 }
 ?>

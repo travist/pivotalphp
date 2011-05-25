@@ -1,7 +1,8 @@
 <?php
-function pdf_contents( &$pdf, $args, $stories ) {
+function pdf_contents( &$pdf, $args, $stories, &$output ) {
   $i = 0;
 
+  $output = '<html><body>';
   $story_width = 98;
   $story_height = 92;
   $space = 5;
@@ -29,6 +30,7 @@ function pdf_contents( &$pdf, $args, $stories ) {
     $pdf->SetFont('times', '', 14);
     $html = '<div>' . $story['id'] . ': <strong>' . $story['name'] . '</strong></div>';
     $html .= (isset($story['description']) && $story['description']) ? '<div style="font-size:30px;">' . $story['description'] . '</div>' : '';
+    $output .= $html;
     
     $pdf->writeHTMLCell($story_width, $story_height, $x, $y, $html, 'LRTB', 1, false, true, 'L', true);
 

@@ -21,7 +21,7 @@ if (is_dir($dir)) {
       if ($node != "." && $node != "..") {
         $path = $dir . DIRECTORY_SEPARATOR . $node;
         $ext = strtolower(substr($node, strrpos($node, '.') + 1));
-        if ($ext == 'php' && !is_dir($path)) {
+        if ($ext == 'php' && !is_dir($path) && $node != 'storycards_html.php') {
           $files[$node] = $path;
         }
       }
@@ -49,6 +49,55 @@ function getScript() {
   }
   else {
     echo "Invalid input.  Please try again.\n";
+    return 0;
+  }
+}
+
+function getFormat() {
+  global $cli;
+  $formats = array();
+  $formats[0] = 'HTML';
+  $formats[1] = 'PDF';
+  $output = "Select an output format:\n";
+  
+  $i = 1;
+  foreach ($formats as $format => $f)
+  {
+    $output .= '    ' . $i . ') ' . $f . "\n";
+    $i++;
+  }
+  $input = $cli->get("html", $output);
+  if (is_numeric($input) && $input <= count($formats)) 
+  {
+    return $input;
+  }
+  else
+  {
+    echo "Invalid input.  Please try again....\n";
+    return 0;
+  }
+}
+
+function getSortOrder()
+{
+  global $cli;
+  $sortOrders = array('story_type', 'estimate', 'requested_by', 'owned_by', 'current_state', 'none');
+  $output = "Select sort order:\n";
+  
+  $i = 1;
+  foreach ($sortOrders as $sortOrder => $s)
+  {
+    $output .= '    ' . $i . ')' . $s . "\n";
+    $i++;
+  }
+  $input = $cli->get("sortOrder", $output);
+  if (is_numeric($input) && $input <= count($sortOrders))
+  {
+    return $sortOrders[($input - 1)];
+  }
+  else
+  {
+    echo "Invalid input.  Please try again....\n";
     return 0;
   }
 }
@@ -138,6 +187,8 @@ $cli->get("project", "Enter you Pivotal Tracker project ID. ( You will only need
 $cli->get("title", "Title: ");
 $cli->get("filter", "Filter: ");
 $cli->set("script", getScript());
+$cli->set("html", getFormat());
+$cli->set("sortOrder", getSortOrder());
 
 // Make sure we have everything.
 if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli->args['script']) {
@@ -193,16 +244,67 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
 
     print $msg;
 
-    // Get the output from our script.
-    pdf_contents($pdf, $cli->args, $stories);
-
-    //Close and output PDF document
-    $pdf_output = $pdf->Output('doc.pdf', 'S');
-
-    // Now write the contents to a file.
-    $filename = $cli->args['title'] . '.pdf';
-    file_put_contents( dirname(__FILE__) . '/' . $filename, $pdf_output);
-    echo "Successfully created " . $filename . "!\n";
+  	$msg2 = sprintf ("Script Type: %s\n", $cli->args['script']);
+	  print $msg2;
+	  
+	  //Sorts the stories by the user's choice
+	  $sortBy = array();
+	  $requested_by = array();
+	  $sortChoice = $cli->args['sortOrder'];
+	  $msg3 = sprintf ("Will sort by %s\n", $sortChoice);
+	  print $msg3;
+	  
+	  foreach($stories as $key => $item)
+	  {
+	    $sortBy[$key] = $item[$sortChoice];
+	    $requested_by[$key] = $item['requested_by'];
+	  }
+	  
+	  //For each sort, the requester is used as the secondary sort key for more order
+	  //Estimate is sorted descending, so that the most important stories are first
+	  if ($sortChoice == 'estimate')
+	  {
+	    array_multisort($sortBy, SORT_DESC, $requested_by, SORT_ASC, $stories);
+	  }
+	  else
+	  {
+	    array_multisort($sortBy, SORT_ASC, $requested_by, SORT_ASC, $stories);
+    }
+	  
+	  
+	  $output = '';
+    
+    //Outputs as HTML
+	  if ($cli->args['html'] == 1)
+	  {
+	    print "Will be in HTML\n";
+	    $filename = $cli->args['title'] . '.html';
+	    if ($cli->args['script'] != 'storycards.php')
+	    {
+  	    pdf_contents($pdf, $cli->args, $stories, $output);
+      }
+      else
+      {
+        require_once('scripts/storycards_html.php');
+        storycard_contents($pdf, $cli->args, $stories, $output);
+      }
+      file_put_contents( dirname(__FILE__) . '/' . $filename, $output);
+      echo "Successfully created " . $filename . "!\n";
+	  }
+	  
+	  //Outputs as a PDF
+	  else
+	  {
+	    print "Will be a PDF\n";
+	    pdf_contents($pdf, $cli->args, $stories, $output);
+	    $pdf->writeHTML($output);
+	    $pdf_output = $pdf->Output('doc.pdf', 'S');
+	    
+	    $filename = $cli->args['title'] . '.pdf';
+      file_put_contents( dirname(__FILE__) . '/' . $filename, $pdf_output);
+      echo "Successfully created " . $filename . "!\n";
+	  }
+	  
   }
   else {
     echo "No stories found.\n";
