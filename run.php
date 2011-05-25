@@ -165,6 +165,7 @@ function getPDF($args) {
 function getStories($args) {
   // Now create a new PivotalTracker object.
   $pivotal = new PivotalTracker($args['token']);
+  echo $args['filter'] . "\n";
   return $pivotal->stories_get_by_filter($args['project'], $args['filter']);
  }
 
