@@ -18,7 +18,7 @@ function storycard_contents( &$pdf, $args, $stories, &$output ) {
     $row = floor($cell / $num_cols);
     $x = $col*$story_width + (($col+1)*$space);
     $y = $row*$story_height + (($row+1)*$space);
-    
+
     if( $cell == 0 ) {
       $pdf->AddPage();
     }
@@ -28,8 +28,7 @@ function storycard_contents( &$pdf, $args, $stories, &$output ) {
     $html = '<div style="border:1px solid black;">' . $story['id'] . ': <h3><strong>' . $story['name'] . '</strong></h3><br/>';
     $html .= (isset($story['description']) && $story['description']) ? $story['description'] : '';
     $html .= '<br/>';
-    
-    
+
     $pdf->writeHTMLCell($story_width, $story_height, $x, $y, $html, 'LRTB', 1, false, true, 'L', true);
 
     // Write the end of table.
@@ -42,7 +41,7 @@ function storycard_contents( &$pdf, $args, $stories, &$output ) {
     if( isset($story['current_state']) ) {
       $html .= ('<br/>Status: ' . $story['current_state']);
     }
-    
+
     if( isset($story['estimate']) ) {
       $html .= ('<br/>Points: ' . $story['estimate']);
     }
@@ -54,14 +53,14 @@ function storycard_contents( &$pdf, $args, $stories, &$output ) {
     if( isset($story['requested_by']) ) {
       $html .= ('<br/>Requester: ' . $story['requested_by']);
     }
-    
+
     if( isset($story['owned_by']) ) {
       $html .= ('<br/>Owner: ' . $story['owned_by']);
     }
 
     $html .= '</div><br/>';
     $output .= $html;
-    
+
     $i++;
   }
 }

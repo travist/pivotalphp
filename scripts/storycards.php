@@ -21,7 +21,7 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
     $row = floor($cell / $num_cols);
     $x = $col*$story_width + (($col+1)*$space);
     $y = $row*$story_height + (($row+1)*$space);
-    
+
     if( $cell == 0 ) {
       $pdf->AddPage();
     }
@@ -31,7 +31,7 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
     $html = '<div>' . $story['id'] . ': <strong>' . $story['name'] . '</strong></div>';
     $html .= (isset($story['description']) && $story['description']) ? '<div style="font-size:30px;">' . $story['description'] . '</div>' : '';
     $output .= $html;
-    
+
     $pdf->writeHTMLCell($story_width, $story_height, $x, $y, $html, 'LRTB', 1, false, true, 'L', true);
 
     // Write the end of table.
@@ -44,7 +44,7 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
     if( isset($story['current_state']) ) {
       $pdf->Text($x + 35, $y + 70, 'Status: ' . $story['current_state']);
     }
-    
+
     if( isset($story['estimate']) ) {
       $pdf->Text($x + 70, $y + 70, 'Points: ' . $story['estimate']);
     }
@@ -56,7 +56,7 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
     if( isset($story['requested_by']) ) {
       $pdf->Text($x, $y + 80, 'Requester: ' . $story['requested_by']);
     }
-    
+
     if( isset($story['owned_by']) ) {
       $pdf->Text($x + 60, $y + 80, 'Owner: ' . $story['owned_by']);
     }

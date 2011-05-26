@@ -39,14 +39,14 @@ if (is_dir($dir)) {
 function promptUserChoice( $prompt, $arg, $options )
 {
   global $cli;
-  
+
   $i = 1;
   foreach($options as $option => $o)
   {
     $prompt .= '    ' . $i . ') ' . $o . "\n";
     $i++;
   }
-  
+
   $input = $cli->get($arg, $prompt);
   if (is_numeric($input) && $input <= count($options))
   {
@@ -97,7 +97,6 @@ function getPDF($args) {
   else {
     $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
   }
-
 
   // set document information
   $pdf->SetCreator($args['name']);
@@ -197,31 +196,29 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
     $msg = "---------------\nTOTALS:\n";
     foreach ($type_cnt as $type => $type_count) {
       $msg .= sprintf ("   %-15.15s : %4d\n",$type."(s)",$type_count);
-    } 
+    }
     $msg .=  "---------------\n";
     $msg .=  "estimate total:$est_cnt\n";
     $msg .=  "---------------\n";
-
-    
 
     print $msg;
 
     $msg2 = sprintf ("Script Type: %s\n", $cli->args['script']);
     print $msg2;
-	  
+
     //Sorts the stories by the user's choice
     $sortBy = array();
     $requested_by = array();
     $sortChoice = $cli->args['sortOrder'];
     $msg3 = sprintf ("Will sort by %s\n", $sortChoice);
     print $msg3;
-	  
+
     foreach($stories as $key => $item)
     {
       $sortBy[$key] = $item[$sortChoice];
       $requested_by[$key] = $item['requested_by'];
     }
-	  
+
     //For each sort, the requester is used as the secondary sort key for more order
     //Estimate is sorted descending, so that the most important stories are first
     if ($sortChoice == 'estimate')
@@ -232,10 +229,8 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
     {
       array_multisort($sortBy, SORT_ASC, $requested_by, SORT_ASC, $stories);
     }
-	  
-	  
+
     $output = '';
-    
     //Outputs as HTML
     if ($cli->args['html'] == 'HTML')
     {
@@ -253,7 +248,7 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
       file_put_contents( dirname(__FILE__) . '/' . $filename, $output);
       echo "Successfully created " . $filename . "!\n";
     }
-	  
+
     //Outputs as a PDF
     else
     {
@@ -261,12 +256,11 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
       pdf_contents($pdf, $cli->args, $stories, $output);
       $pdf->writeHTML($output);
       $pdf_output = $pdf->Output('doc.pdf', 'S');
-	    
+
       $filename = $cli->args['title'] . '.pdf';
       file_put_contents( dirname(__FILE__) . '/' . $filename, $pdf_output);
       echo "Successfully created " . $filename . "!\n";
     }
-	  
   }
   else {
     echo "No stories found.\n";
