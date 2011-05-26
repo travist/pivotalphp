@@ -177,13 +177,9 @@ class PivotalTrackerREST {
     // Construct the full URL
     $url = $this->base_url . $function;
 
-
     $url = str_replace("&amp;", "&", urldecode(trim($url)));
 
-
     $fields = (is_array($vars)) ? http_build_query($vars) : $vars;
-
-print "URL:$url\n";
 
     $ch = curl_init($url);
 
@@ -242,7 +238,6 @@ print "URL:$url\n";
     // Warning: This will blindly accept any certificate (even self signed ones) and is essentially unsecure
     // TODO: Do real authentication. http://unitstep.net/blog/2009/05/05/using-curl-in-php-to-access-https-ssltls-protected-sites/
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
 
     // Debug stuff
     //$this->_rest_debug($ch);
