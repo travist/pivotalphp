@@ -21,15 +21,15 @@ class devStoryList {
 // creates a flat text file with the story, the dev on the story, and
 function pdf_contents(&$pdf, $args, $stories) {
 	$devList; // array of devStoryList objects
-	
+
 	//set font
 	$pdf->SetFont('courier', 11);
-	
+
 	//add a page
 	$pdf->AddPage();
-	
+
 	$output = '<html><body>';
-	
+
 	// populate $devList with $stories
 	$firstIteration = true;
 	foreach ($stories as $story) {
@@ -74,10 +74,9 @@ function pdf_contents(&$pdf, $args, $stories) {
 			$output.='     '.($j+1).'. '.$devList[$i]->stateList[$j].'->'.($devList[$i]->storyList[$j]).'<br>'; // write the story
 		}
 	}
-	
+
 	// close body
 	$output .= '</body></html>';
 	$pdf->writeHTML($output);
-	
 }
 ?>
