@@ -77,6 +77,5 @@ function pdf_contents(&$pdf, $args, $stories, &$output) {
 
 	// close body
 	$output .= '</body></html>';
-	$pdf->writeHTML($output);
 }
 ?>
