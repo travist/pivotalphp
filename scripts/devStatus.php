@@ -19,7 +19,7 @@ class devStoryList {
 	}
 }
 // creates a flat text file with the story, the dev on the story, and
-function pdf_contents(&$pdf, $args, $stories) {
+function pdf_contents(&$pdf, $args, $stories, &$output) {
 	$devList; // array of devStoryList objects
 
 	//set font
