@@ -177,13 +177,9 @@ class PivotalTrackerREST {
     // Construct the full URL
     $url = $this->base_url . $function;
 
-
     $url = str_replace("&amp;", "&", urldecode(trim($url)));
 
-
     $fields = (is_array($vars)) ? http_build_query($vars) : $vars;
-
-print "URL:$url\n";
 
     $ch = curl_init($url);
 

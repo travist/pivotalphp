@@ -171,41 +171,35 @@ function getStories($args) {
 $cli->get("name", "Enter your full name. ( You will only need to do this once ):", TRUE);
 $cli->set("token", getToken(), TRUE);
 
-if(isset($cli->args['project1']))
-{
-	//Projects exist
-    echo "Select from the following list (1,2,etc), or type a new Project ID\n";
-    $temp = 1;
-    //List projects
-    while(isset($cli->args['project'.$temp]))
-    {
-        echo "  ".$temp.". ".$cli->args['title'.$temp].' - '.$cli->args['project'.$temp]."\n";
-        $temp++;
-    }
-    $cli->get('project', 'Selection: ');
-    if(isset($cli->args['project'.$cli->args['project']]))
-    {
-    	//Number choice
-        $cli->set('title', $cli->args['title'.$cli->args['project']]);
-        $cli->set('project',$cli->args['project'.$cli->args['project']]);
-    }
-    else
-    {
-    	//New project
-        $cli->get('title'.$temp, "Title: ", TRUE);
-        $cli->set('title', $cli->args['title'.$temp]);
-        $cli->set('project'.$temp, $cli->args['project'], TRUE);
-    }
+if(isset($cli->args['project1'])) {
+  //Projects exist
+  echo "Select from the following list (1,2,etc), or type a new Project ID\n";
+  $temp = 1;
+  //List projects
+  while(isset($cli->args['project'.$temp])) {
+    echo "  ".$temp.". ".$cli->args['title'.$temp].' - '.$cli->args['project'.$temp]."\n";
+    $temp++;
+  }
+  $cli->get('project', 'Selection: ');
+  if(isset($cli->args['project'.$cli->args['project']])) {
+    //Number choice
+    $cli->set('title', $cli->args['title'.$cli->args['project']]);
+    $cli->set('project',$cli->args['project'.$cli->args['project']]);
+  }
+  else {
+    //New project
+    $cli->get('title'.$temp, "Title: ", TRUE);
+    $cli->set('title', $cli->args['title'.$temp]);
+    $cli->set('project'.$temp, $cli->args['project'], TRUE);
+  }
 }
-else
-{
-	//New user
-    $cli->get("project1", "No Pivotal Tracker Project ID found\nEnter your PT PID:", TRUE);
-    $cli->set("project", $cli->args['project1']);
-    $cli->get("title1", "Title: ",TRUE);
-    $cli->set("title", $cli->args['title1']);
+else {
+  //New user
+  $cli->get("project1", "No Pivotal Tracker Project ID found\nEnter your PT PID:", TRUE);
+  $cli->set("project", $cli->args['project1']);
+  $cli->get("title1", "Title: ",TRUE);
+  $cli->set("title", $cli->args['title1']);
 }
-
 $cli->get("filter", "Filter: ");
 $cli->set("filter", urlencode($cli->args['filter']));
 $cli->set("script", promptUserChoice("Select an output script:\n", "script", $files));
@@ -216,7 +210,6 @@ $cli->set("sortOrder", promptUserChoice("Select a sort order:\n", "sortOrder", $
 
 // Make sure we have everything.
 if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli->args['script']) {
-
   // Get the PDF.
   $pdf = getPDF($cli->args);
 
