@@ -172,8 +172,9 @@ $cli->get("name", "Enter your full name. ( You will only need to do this once ):
 $cli->set("token", getToken(), TRUE);
 
 if(isset($cli->args['project1'])) {
-  //Projects exist
-  echo "Select from the following list (1,2,etc), or type a new Project ID\n";
+  //Projects exist (not a new user)
+  echo "Select a Project ID from the following list\n";
+  echo "You may request a number (1,2,etc), an existing ID, or a new ID\n";
   $temp = 1;
   //List projects
   while(isset($cli->args['project'.$temp])) {
@@ -187,10 +188,27 @@ if(isset($cli->args['project1'])) {
     $cli->set('project',$cli->args['project'.$cli->args['project']]);
   }
   else {
-    //New project
-    $cli->get('title'.$temp, "Title: ", TRUE);
-    $cli->set('title', $cli->args['title'.$temp]);
-    $cli->set('project'.$temp, $cli->args['project'], TRUE);
+    //Determine if it exists
+    $exists = FALSE;
+    $temp = 1;
+    while(isset($cli->args['project'.$temp])) {
+      if($cli->args['project'.$temp] == $cli->args['project']) {
+        $exists - TRUE;
+        break;
+      }
+      $temp++;
+    }
+    if(!$exists)
+    {
+      //New project
+      $cli->get('title'.$temp, "Title: ", TRUE);
+      $cli->set('title', $cli->args['title'.$temp]);
+      $cli->set('project'.$temp, $cli->args['project'], TRUE);
+    }
+    else {
+      //Existing PID
+      $cli->set('title', $cli->args['title'.$temp]);
+    }
   }
 }
 else {
