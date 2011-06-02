@@ -102,7 +102,7 @@ function prompt_silent($prompt = "Enter Password:") {
 function get_project_name($idnum) {
   global $cli;
   if(isset($cli->args['token'])) {
-    $output = shell_exec('curl -s -H "X-TrackerToken: '.$cli->args['token'].'" -X GET http://www.pivotaltracker.com/services/v3/projects/'.$idnum);
+    $output = shell_exec('curl -s -H "X-TrackerToken: ' . $cli->args['token'] . '" -X GET http://www.pivotaltracker.com/services/v3/projects/' . $idnum);
     $matches = array();
     preg_match('/\<name\>([0-9a-zA-Z\s[:punct:]]+?)\<\/name\>/', $output, $matches);
     return $matches[1];
@@ -194,27 +194,27 @@ if(isset($cli->args['project1'])) {
   echo "Select a Project ID from the following list\n";
   echo "You may request a number (1,2,etc), an existing ID, or a new ID\n";
   //List projects, go through at least 10 (for deletion purposes)
-  for($temp = 1; $temp <= 10 || isset($cli->args['project'.$temp]); $temp++)
-    if(isset($cli->args['project'.$temp]))
-      echo "    ".$temp.") ".get_project_name($cli->args['project'.$temp]).' - '.$cli->args['project'.$temp]."\n";
+  for($temp = 1; $temp <= 10 || isset($cli->args['project' . $temp]); $temp++)
+    if(isset($cli->args['project' . $temp]))
+      echo "    " . $temp . ") " . get_project_name($cli->args['project' . $temp]) . ' - ' . $cli->args['project' . $temp] . "\n";
   $cli->get('project', 'Selection: ');
   //Number choice
-  if(isset($cli->args['project'.$cli->args['project']]))
-    $cli->set('project',$cli->args['project'.$cli->args['project']]);
+  if(isset($cli->args['project' . $cli->args['project']]))
+    $cli->set('project',$cli->args['project' . $cli->args['project']]);
   else {
     //Determine if it exists
     $exists = FALSE;
     $temp = 1;
-    while(isset($cli->args['project'.$temp])) {
-      if($cli->args['project'.$temp] == $cli->args['project']) {
-        $exists - TRUE;
+    while(isset($cli->args['project' . $temp])) {
+      if($cli->args['project' . $temp] == $cli->args['project']) {
+        $exists = TRUE;
         break;
       }
       $temp++;
     }
     //New Project
     if(!$exists)
-      $cli->set('project'.$temp, $cli->args['project'], TRUE);
+      $cli->set('project' . $temp, $cli->args['project'], TRUE);
   }
 }
 else {
