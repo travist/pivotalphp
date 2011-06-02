@@ -60,11 +60,12 @@ function promptUserChoice( $prompt, $arg, $options )
   }
 }
 
-/*
+/**
  * Prompts for something silently
- * Should work on UNIX/DOS
- * 
+ * Should work on UNIX/DOS 
  * http://blogs.sitepoint.com/interactive-cli-password-prompt-in-php/
+ *
+ * @return string
  */
 function prompt_silent($prompt = "Enter Password:") {
   if (preg_match('/^win/i', PHP_OS)) {
@@ -90,6 +91,23 @@ function prompt_silent($prompt = "Enter Password:") {
     echo "\n";
     return $password;
   }
+}
+
+/**
+ * Gets the name of a project using its number
+ * Returns empty string if failure
+ *
+ * @return string
+ */
+function get_project_name($idnum) {
+  global $cli;
+  if(isset($cli->args['token'])) {
+    $output = shell_exec('curl -s -H "X-TrackerToken: ' . $cli->args['token'] . '" -X GET http://www.pivotaltracker.com/services/v3/projects/' . $idnum);
+    $matches = array();
+    preg_match('/\<name\>([0-9a-zA-Z\s[:punct:]]+?)\<\/name\>/', $output, $matches);
+    return $matches[1];
+  }
+  return '';
 }
 
 /**
@@ -175,49 +193,36 @@ if(isset($cli->args['project1'])) {
   //Projects exist (not a new user)
   echo "Select a Project ID from the following list\n";
   echo "You may request a number (1,2,etc), an existing ID, or a new ID\n";
-  $temp = 1;
-  //List projects
-  while(isset($cli->args['project'.$temp])) {
-    echo "  ".$temp.". ".$cli->args['title'.$temp].' - '.$cli->args['project'.$temp]."\n";
-    $temp++;
-  }
+  //List projects, go through at least 10 (for deletion purposes)
+  for($temp = 1; $temp <= 10 || isset($cli->args['project' . $temp]); $temp++)
+    if(isset($cli->args['project' . $temp]))
+      echo "    " . $temp . ") " . get_project_name($cli->args['project' . $temp]) . ' - ' . $cli->args['project' . $temp] . "\n";
   $cli->get('project', 'Selection: ');
-  if(isset($cli->args['project'.$cli->args['project']])) {
-    //Number choice
-    $cli->set('title', $cli->args['title'.$cli->args['project']]);
-    $cli->set('project',$cli->args['project'.$cli->args['project']]);
-  }
+  //Number choice
+  if(isset($cli->args['project' . $cli->args['project']]))
+    $cli->set('project',$cli->args['project' . $cli->args['project']]);
   else {
     //Determine if it exists
     $exists = FALSE;
     $temp = 1;
-    while(isset($cli->args['project'.$temp])) {
-      if($cli->args['project'.$temp] == $cli->args['project']) {
-        $exists - TRUE;
+    while(isset($cli->args['project' . $temp])) {
+      if($cli->args['project' . $temp] == $cli->args['project']) {
+        $exists = TRUE;
         break;
       }
       $temp++;
     }
+    //New Project
     if(!$exists)
-    {
-      //New project
-      $cli->get('title'.$temp, "Title: ", TRUE);
-      $cli->set('title', $cli->args['title'.$temp]);
-      $cli->set('project'.$temp, $cli->args['project'], TRUE);
-    }
-    else {
-      //Existing PID
-      $cli->set('title', $cli->args['title'.$temp]);
-    }
+      $cli->set('project' . $temp, $cli->args['project'], TRUE);
   }
 }
 else {
   //New user
   $cli->get("project1", "No Pivotal Tracker Project ID found\nEnter your PT PID:", TRUE);
   $cli->set("project", $cli->args['project1']);
-  $cli->get("title1", "Title: ",TRUE);
-  $cli->set("title", $cli->args['title1']);
 }
+$cli->get("title", "Name of File without extension: ");
 $cli->get("filter", "Filter: ");
 $cli->set("filter", urlencode($cli->args['filter']));
 $cli->set("script", promptUserChoice("Select an output script:\n", "script", $files));
