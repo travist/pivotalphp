@@ -61,39 +61,6 @@ function promptUserChoice( $prompt, $arg, $options )
 }
 
 /**
- * Prompts for something silently
- * Should work on UNIX/DOS 
- * http://blogs.sitepoint.com/interactive-cli-password-prompt-in-php/
- *
- * @return string
- */
-function prompt_silent($prompt = "Enter Password:") {
-  if (preg_match('/^win/i', PHP_OS)) {
-    $vbscript = sys_get_temp_dir() . 'prompt_password.vbs';
-    file_put_contents(
-      $vbscript, 'wscript.echo(InputBox("'
-      . addslashes($prompt)
-      . '", "", "password here"))');
-    $command = "cscript //nologo " . escapeshellarg($vbscript);
-    $password = rtrim(shell_exec($command));
-    unlink($vbscript);
-    return $password;
-  } else {
-    $command = "/usr/bin/env bash -c 'echo OK'";
-    if (rtrim(shell_exec($command)) !== 'OK') {
-      trigger_error("Can't invoke bash");
-      return;
-    }
-    $command = "/usr/bin/env bash -c 'read -s -p \""
-      . addslashes($prompt)
-      . "\" mypassword && echo \$mypassword'";
-    $password = rtrim(shell_exec($command));
-    echo "\n";
-    return $password;
-  }
-}
-
-/**
  * Gets the name of a project using its number
  * Returns empty string if failure
  *
@@ -122,7 +89,7 @@ function getToken() {
   }
   else {
     $username = $cli->get("username", "Enter your Pivotal Tracker user name. ( You will only need to do this once ):");
-    $password = prompt_silent("Enter you Pivotal Tracker password. ( You will only need to do this once ):");
+    $password = $cli->get("password", "Enter you Pivotal Tracker password. ( You will only need to do this once ):", FALSE, TRUE);
     $output = shell_exec('curl -u ' . $username . ':' . $password . ' -X GET https://www.pivotaltracker.com/services/v3/tokens/active');
     $matches = array();
     preg_match('/\<guid\>([0-9a-zA-Z]+)\<\/guid\>/', $output, $matches);
