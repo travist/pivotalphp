@@ -72,7 +72,7 @@ function get_project_name($idnum) {
     $output = shell_exec('curl -s -H "X-TrackerToken: ' . $cli->args['token'] . '" -X GET http://www.pivotaltracker.com/services/v3/projects/' . $idnum);
     $matches = array();
     preg_match('/\<name\>([0-9a-zA-Z\s[:punct:]]+?)\<\/name\>/', $output, $matches);
-    return $matches[1];
+    return $matches ? $matches[1] : '';
   }
   return '';
 }
@@ -221,19 +221,38 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
     $est_type_cnt   = array('bug'=>0,'feature'=>0,'release'=>0);
     $est_accept_type_cnt = array('bug'=>0,'feature'=>0,'release'=>0);
     $state_type_cnt = array();
+    $est_accept_cnt = 0;
     $est_cnt = 0;
     foreach ($stories as $story) {
-      if ($story['story_type']) {
-        $type_cnt[$story['story_type']]++;
-	if ($story['estimate'] > 0) {
-          $est_cnt = $est_cnt + $story['estimate'];
-	  if ($story['current_state'] == 'accepted') {
-   	    $est_accept_type_cnt[$story['story_type']] += $story['estimate'];
-	    $est_accept_cnt += $story['estimate'];
-	  }
-	  $est_type_cnt[$story['story_type']] += $story['estimate'];
+      $type = $story['story_type'];
+      if ($type) {
+        $state = $story['current_state'];
+        $estimate = isset($story['estimate']) ? $story['estimate'] : 0;
+        if (!isset($type_cnt[$type])) {
+          $type_cnt[$type] = 0;
         }
-        $state_type_cnt[$story['story_type']][$story['current_state']]++;
+        $type_cnt[$type]++;
+	if ($estimate > 0) {
+          $est_cnt += $estimate;
+	  if ($state == 'accepted') {
+            if (!isset($est_accept_type_cnt[$type])) {
+              $est_accept_type_cnt[$type] = 0;
+            }
+   	    $est_accept_type_cnt[$type] += $estimate;
+	    $est_accept_cnt += $estimate;
+	  }
+          if (!isset($est_type_cnt[$type])) {
+            $est_type_cnt[$type] = 0;
+          }
+	  $est_type_cnt[$type] += $estimate;
+        }
+        if (!isset($state_type_cnt[$type])) {
+          $state_type_cnt[$type] = array();
+        }
+        if (!isset($state_type_cnt[$type][$state])) {
+          $state_type_cnt[$type][$state] = 0;
+        }
+        $state_type_cnt[$type][$state]++;
       }    
     }
 //    var_dump($est_type_cnt);
