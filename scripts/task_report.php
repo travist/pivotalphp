@@ -18,8 +18,8 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
   // Now Iterate through the stories.
   foreach ($stories as $story) {
     if (($story['story_type'] != 'release') && ($story['story_type'] != 'chore')) {
+      $total++;
       if ( isset($story['tasks']) && count($story['tasks']) > 0) {
-        $total++;
         $test_count++;
         $tests .= '<a href="' . $story['url'] . '">' . $story['id'] . '</a>:';
         $tests .= '&nbsp;&nbsp;' . $story['story_type'] . ':&nbsp;&nbsp;<strong>' . $story['name'] . '</strong>';
@@ -36,8 +36,7 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
         }
         $tests .= '</ol>';
       }
-      else if( in_array($story['current_state'], array('delivered', 'finished', 'accepted')) ) {
-        $total++;
+      else {
         $owned_by = isset($story['owned_by']) ? $story['owned_by'] : 'none';
         $notests .= '<li>';
         $notests .= '<a href="' . $story['url'] . '">' . $story['id'] . '</a>:&nbsp;&nbsp;';
