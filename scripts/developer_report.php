@@ -27,21 +27,30 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
   }
 
   $table .= '<table border="2" cellpadding="5">';
-  $table .= '<tr><th>Developer</th><th>Story</th><th>Estimate</th><th>Story Type</th></tr>';
+  $table .= '<tr><th>Developer</th><th>Story</th><th>Estimate</th><th>Diff</th><th>Pull Request</th><th>Story Type</th></tr>';
   $velocities = array();
   foreach ($dev_stories as $owner => $dstories) {
     $velocities[$owner] = 0;
     $table .= '<table border="2" cellpadding="5">';
     foreach ($dstories as $id => $dstory) {
+      $info = shell_exec('git log --since="2011-9-1" --until="2011-11-15" | grep "Merge pull request.*' . $id . '" -B 5');
+      $matches = array();
+      if ($info) {
+        preg_match('/commit ([0-9a-f]+).*Merge pull request \#([0-9]+)/s', $info, $matches);
+      }
+      $sha = $matches[1] ? trim($matches[1]) : '';
+      $pull = $matches[2] ? trim($matches[2]) : '';
       $velocities[$owner] += $dstory['estimate'];
       $table .= '<tr>';
       $table .= '<td>' . $owner . '</td>';
       $table .= '<td><a href="https://www.pivotaltracker.com/story/show/' . $id . '">sid-' . $id . '</a>:&nbsp;&nbsp;' . $dstory['name'] . '</td>';
       $table .= '<td>' . $dstory['estimate'] . '</td>';
+      $table .= $sha ? '<td><a href="https://github.com/AllPlayers/allplayers-mainline/commit/' . $sha . '">DIFF</a></td>' : '<td></td>';
+      $table .= $pull ? '<td><a href="https://github.com/AllPlayers/allplayers-mainline/pull/' . $pull . '">PULL</a></td>' : '<td></td>';
       $table .= '<td>' . $dstory['story_type'] . '</td>';
       $table .= '</tr>';
     }
-    $table .= '<tr><td bgcolor="#33FF33">Total Velocity</td><td bgcolor="#33FF33" colspan="3">' . $velocities[$owner] . '</td></tr>';
+    $table .= '<tr><td bgcolor="#33FF33">Total Velocity</td><td bgcolor="#33FF33" colspan="4">' . $velocities[$owner] . '</td></tr>';
     $table .= '</table>';
   }
   $table .= '</table>';
