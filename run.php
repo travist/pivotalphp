@@ -32,7 +32,7 @@ if (is_dir($dir)) {
 
 /**
  * Presents a list of options to the user, and returns their choice
- * 
+ *
  * @return <type>
  */
 
@@ -79,7 +79,7 @@ function get_project_name($idnum) {
 
 /**
  * Get's your pivotal tracker token.
- * 
+ *
  * @return array
  */
 function getToken() {
@@ -99,7 +99,7 @@ function getToken() {
 
 /**
  * Get's the PDF object.
- * 
+ *
  * @param <type> $config
  * @return TCPDF
  */
@@ -142,7 +142,7 @@ function getPDF($args) {
 
 /**
  * Get's the privotal tracker stories based on a filter.
- * 
+ *
  * @param <type> $config
  * @param <type> $filter
  * @return <type>
@@ -150,7 +150,12 @@ function getPDF($args) {
 function getStories($args) {
   // Now create a new PivotalTracker object.
   $pivotal = new PivotalTracker($args['token']);
-  return $pivotal->stories_get_by_filter($args['project'], $args['filter']);
+  $filters = explode('|', $args['filter']);
+  $stories = array();
+  foreach ($filters as $filter) {
+    $stories = array_merge($stories, $pivotal->stories_get_by_filter($args['project'], urlencode($filter)));
+  }
+  return $stories;
  }
 
 $cli->get("name", "Enter your full name. ( You will only need to do this once ):", TRUE);
@@ -191,7 +196,7 @@ else {
 }
 $cli->get("title", "Name of File without extension: ");
 $cli->get("filter", "Filter: ");
-$cli->set("filter", urlencode($cli->args['filter']));
+$cli->set("filter", $cli->args['filter']);
 $cli->set("script", promptUserChoice("Select an output script:\n", "script", $files));
 $sortOrders = array('story_type' => 'Story type', 'estimate' => 'Estimate', 'requested_by' => 'Requested by', 'owned_by' => 'Owned by', 'current_state' => 'Current state', 'none' => 'None');
 $formats = array('HTML' => 'HTML', 'PDF' => 'PDF');
@@ -253,7 +258,7 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
           $state_type_cnt[$type][$state] = 0;
         }
         $state_type_cnt[$type][$state]++;
-      }    
+      }
     }
 //    var_dump($est_type_cnt);
 //    var_dump($state_type_cnt);
