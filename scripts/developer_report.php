@@ -33,7 +33,7 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
     $velocities[$owner] = 0;
     $table .= '<table border="2" cellpadding="5">';
     foreach ($dstories as $id => $dstory) {
-      $info = shell_exec('git log --since="2011-9-1" --until="2011-11-15" | grep "Merge pull request.*' . $id . '" -B 5');
+      $info = shell_exec('git log | grep "Merge pull request.*' . $id . '" -B 5');
       $matches = array();
       if ($info) {
         preg_match('/commit ([0-9a-f]+).*Merge pull request \#([0-9]+)/s', $info, $matches);
