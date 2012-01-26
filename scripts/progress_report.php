@@ -1,5 +1,6 @@
 <?php
-function get_output( &$pdf, $args, $stories, &$output ) {
+
+function get_output(&$pdf, $args, $stories) {
   $output = '<html><body>';
 
   $output .= '<h1>' . $args['title'] . '</h2>';
@@ -13,13 +14,13 @@ function get_output( &$pdf, $args, $stories, &$output ) {
   foreach ($stories as $story) {
     if (($story['story_type'] != 'release') && ($story['story_type'] != 'chore')) {
       $total++;
-      if ( isset($story['tasks']) && count($story['tasks']) > 0) {
+      if (isset($story['tasks']) && count($story['tasks']) > 0) {
         $test_count++;
         $tests .= '<a href="' . $story['url'] . '">' . $story['id'] . '</a>:';
         $tests .= '&nbsp;&nbsp;' . $story['story_type'] . ':&nbsp;&nbsp;<strong>' . $story['name'] . '</strong>';
         $tests .= '<ol>';
         foreach ($story['tasks'] as $tasks) {
-          if( isset($tasks['description']) ) {
+          if (isset($tasks['description'])) {
             $tests .= '<li>' . $tasks['description'] . '</li>';
           }
           else {
@@ -31,10 +32,8 @@ function get_output( &$pdf, $args, $stories, &$output ) {
         $tests .= '</ol>';
       }
       else {
-        $owned_by = isset($story['owned_by']) ? $story['owned_by'] : 'none';
         $notests .= '<li>';
-        $notests .= '<a href="' . $story['url'] . '">' . $story['id'] . '</a>:&nbsp;&nbsp;';
-        $notests .= '<strong>' . $owned_by . '</strong>';
+        $notests .= '<a href="' . $story['url'] . '">' . $story['id'] . '</a>:';
         $notests .= '&nbsp;&nbsp;' . $story['story_type'] . ':&nbsp;&nbsp;<strong>' . $story['name'] . '</strong>';
         $notests .= '</li>';
       }
@@ -54,4 +53,5 @@ function get_output( &$pdf, $args, $stories, &$output ) {
   // Close out the body.
   $output .= '</body></html>';
 }
+
 ?>

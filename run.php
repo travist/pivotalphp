@@ -1,6 +1,5 @@
 #!/usr/bin/php
 <?php
-
 require_once('cliphp/cli.php');
 require_once('includes/pivotaltracker_rest.php');
 require_once('includes/tcpdf/config/lang/eng.php');
@@ -29,32 +28,26 @@ if (is_dir($dir)) {
   }
 }
 
-
 /**
  * Presents a list of options to the user, and returns their choice
  *
  * @return <type>
  */
-
-function promptUserChoice( $prompt, $arg, $options )
-{
+function promptUserChoice($prompt, $arg, $options) {
   global $cli;
 
   $i = 1;
-  foreach($options as $option => $o)
-  {
+  foreach ($options as $option => $o) {
     $prompt .= '    ' . $i . ') ' . $o . "\n";
     $i++;
   }
 
   $input = $cli->get($arg, $prompt);
-  if (is_numeric($input) && $input <= count($options))
-  {
+  if (is_numeric($input) && $input <= count($options)) {
     $keys = array_keys($options);
     return $keys[($input - 1)];
   }
-  else
-  {
+  else {
     echo "Invalid input here.  Please try again.\n";
     return 0;
   }
@@ -68,7 +61,7 @@ function promptUserChoice( $prompt, $arg, $options )
  */
 function get_project_name($idnum) {
   global $cli;
-  if(isset($cli->args['token'])) {
+  if (isset($cli->args['token'])) {
     $output = shell_exec('curl -s -H "X-TrackerToken: ' . $cli->args['token'] . '" -X GET http://www.pivotaltracker.com/services/v3/projects/' . $idnum);
     $matches = array();
     preg_match('/\<name\>([0-9a-zA-Z\s[:punct:]]+?)\<\/name\>/', $output, $matches);
@@ -156,36 +149,36 @@ function getStories($args) {
     $stories = array_merge($stories, $pivotal->stories_get_by_filter($args['project'], urlencode($filter)));
   }
   return $stories;
- }
+}
 
 $cli->get("name", "Enter your full name. ( You will only need to do this once ):", TRUE);
 $cli->set("token", getToken(), TRUE);
 
-if(isset($cli->args['project1'])) {
+if (isset($cli->args['project1'])) {
   //Projects exist (not a new user)
   echo "Select a Project ID from the following list\n";
   echo "You may request a number (1,2,etc), an existing ID, or a new ID\n";
   //List projects, go through at least 10 (for deletion purposes)
-  for($temp = 1; $temp <= 10 || isset($cli->args['project' . $temp]); $temp++)
-    if(isset($cli->args['project' . $temp]))
+  for ($temp = 1; $temp <= 10 || isset($cli->args['project' . $temp]); $temp++)
+    if (isset($cli->args['project' . $temp]))
       echo "    " . $temp . ") " . get_project_name($cli->args['project' . $temp]) . ' - ' . $cli->args['project' . $temp] . "\n";
   $cli->get('project', 'Selection: ');
   //Number choice
-  if(isset($cli->args['project' . $cli->args['project']]))
-    $cli->set('project',$cli->args['project' . $cli->args['project']]);
+  if (isset($cli->args['project' . $cli->args['project']]))
+    $cli->set('project', $cli->args['project' . $cli->args['project']]);
   else {
     //Determine if it exists
     $exists = FALSE;
     $temp = 1;
-    while(isset($cli->args['project' . $temp])) {
-      if($cli->args['project' . $temp] == $cli->args['project']) {
+    while (isset($cli->args['project' . $temp])) {
+      if ($cli->args['project' . $temp] == $cli->args['project']) {
         $exists = TRUE;
         break;
       }
       $temp++;
     }
     //New Project
-    if(!$exists)
+    if (!$exists)
       $cli->set('project' . $temp, $cli->args['project'], TRUE);
   }
 }
@@ -217,14 +210,9 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
     echo "Source File: " . $cli->args['script'] . "\n";
     require_once($cli->args['script']);
 
-    // counts for stories
-    //var_dump($stories);
-    //exit();
-
-    //counts for stories
-    $type_cnt = array('bug'=>0,'feature'=>0,'release'=>0);
-    $est_type_cnt   = array('bug'=>0,'feature'=>0,'release'=>0);
-    $est_accept_type_cnt = array('bug'=>0,'feature'=>0,'release'=>0);
+    $type_cnt = array('bug' => 0, 'feature' => 0, 'release' => 0);
+    $est_type_cnt = array('bug' => 0, 'feature' => 0, 'release' => 0);
+    $est_accept_type_cnt = array('bug' => 0, 'feature' => 0, 'release' => 0);
     $state_type_cnt = array();
     $est_accept_cnt = 0;
     $est_cnt = 0;
@@ -237,19 +225,19 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
           $type_cnt[$type] = 0;
         }
         $type_cnt[$type]++;
-	if ($estimate > 0) {
+        if ($estimate > 0) {
           $est_cnt += $estimate;
-	  if ($state == 'accepted') {
+          if ($state == 'accepted') {
             if (!isset($est_accept_type_cnt[$type])) {
               $est_accept_type_cnt[$type] = 0;
             }
-   	    $est_accept_type_cnt[$type] += $estimate;
-	    $est_accept_cnt += $estimate;
-	  }
+            $est_accept_type_cnt[$type] += $estimate;
+            $est_accept_cnt += $estimate;
+          }
           if (!isset($est_type_cnt[$type])) {
             $est_type_cnt[$type] = 0;
           }
-	  $est_type_cnt[$type] += $estimate;
+          $est_type_cnt[$type] += $estimate;
         }
         if (!isset($state_type_cnt[$type])) {
           $state_type_cnt[$type] = array();
@@ -260,78 +248,59 @@ if ($cli->args['token'] && $cli->args['project'] && $cli->args['title'] && $cli-
         $state_type_cnt[$type][$state]++;
       }
     }
-//    var_dump($est_type_cnt);
-//    var_dump($state_type_cnt);
 
-    //var_dump($type_cnt);
     $msg = "---------------\nTOTALS:\n";
     foreach ($type_cnt as $type => $type_count) {
-      $msg .= sprintf ("   %-15.15s : %4d\n",$type."(s)",$type_count);
+      $msg .= sprintf("   %-15.15s : %4d\n", $type . "(s)", $type_count);
     }
-    $msg .=  "---------------\n";
-    $msg .=  "estimate total:$est_cnt\n";
-    $msg .=  "---------------\n";
+    $msg .= "---------------\n";
+    $msg .= "estimate total:$est_cnt\n";
+    $msg .= "---------------\n";
 
     print $msg;
 
-    $msg2 = sprintf ("Script Type: %s\n", $cli->args['script']);
+    $msg2 = sprintf("Script Type: %s\n", $cli->args['script']);
     print $msg2;
 
     //Sorts the stories by the user's choice
     $sortBy = array();
     $requested_by = array();
     $sortChoice = $cli->args['sortOrder'];
-    $msg3 = sprintf ("Will sort by %s\n", $sortChoice);
+    $msg3 = sprintf("Will sort by %s\n", $sortChoice);
     print $msg3;
 
-    foreach($stories as $key => $item)
-    {
+    foreach ($stories as $key => $item) {
       $sortBy[$key] = $item[$sortChoice];
       $requested_by[$key] = $item['requested_by'];
     }
 
     //For each sort, the requester is used as the secondary sort key for more order
     //Estimate is sorted descending, so that the most important stories are first
-    if ($sortChoice == 'estimate')
-    {
+    if ($sortChoice == 'estimate') {
       array_multisort($sortBy, SORT_DESC, $requested_by, SORT_ASC, $stories);
     }
-    else
-    {
+    else {
       array_multisort($sortBy, SORT_ASC, $requested_by, SORT_ASC, $stories);
     }
 
     $output = '';
     //Outputs as HTML
-    if ($cli->args['html'] == 'HTML')
-    {
-      print "Will be in HTML\n";
+    if ($cli->args['html'] == 'HTML') {
       $filename = $cli->args['title'] . '.html';
-      if ($cli->args['script'] != 'storycards.php')
-      {
-        pdf_contents($pdf, $cli->args, $stories, $output);
-      }
-      else
-      {
-        require_once('scripts/storycards_html.php');
-        storycard_contents($pdf, $cli->args, $stories, $output);
-      }
-      file_put_contents( dirname(__FILE__) . '/' . $filename, $output);
-      echo "Successfully created " . $filename . "!\n";
+      get_output($pdf, $cli->args, $stories, $output);
     }
-
-    //Outputs as a PDF
-    else
-    {
-      print "Will be a PDF\n";
-      pdf_contents($pdf, $cli->args, $stories, $output);
+    else {
+      $pdf->SetFont('courier', 'B', 12);
+      $pdf->AddPage();
+      get_output($pdf, $cli->args, $stories, $output);
       $pdf->writeHTML($output);
-      $pdf_output = $pdf->Output('doc.pdf', 'S');
-
+      $output = $pdf->Output('doc.pdf', 'S');
       $filename = $cli->args['title'] . '.pdf';
-      file_put_contents( dirname(__FILE__) . '/' . $filename, $pdf_output);
-      echo "Successfully created " . $filename . "!\n";
     }
+
+    // Create the file.
+    file_put_contents(dirname(__FILE__) . '/' . $filename, $output);
+    echo "Successfully created " . $filename . "!\n";
   }
   else {
     echo "No stories found.\n";

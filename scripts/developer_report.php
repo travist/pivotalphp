@@ -1,8 +1,6 @@
 <?php
-function pdf_contents( &$pdf, $args, $stories, &$output ) {
-  $pdf->SetFont('courier', 'B', 12);
-  $pdf->AddPage();
 
+function get_output(&$pdf, $args, $stories, &$output) {
   $output = '<html><body>';
   $output .= '<h1>' . $args['title'] . '</h2>';
 
@@ -32,7 +30,7 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
   foreach ($dev_stories as $owner => $dstories) {
     $velocities[$owner] = 0;
     foreach ($dstories as $id => $dstory) {
-      $info = shell_exec('git log | grep "Merge pull request.*' . $id . '" -B 5');
+      $info = shell_exec('git log webapp/master | grep "Merge pull request.*' . $id . '" -B 5');
       $matches = array();
       if ($info) {
         preg_match('/commit ([0-9a-f]+).*Merge pull request \#([0-9]+)/s', $info, $matches);
@@ -69,4 +67,5 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
   // Close out the body.
   $output .= '</body></html>';
 }
+
 ?>
