@@ -1,9 +1,23 @@
 <?php
 
 function get_output(&$pdf, $args, $stories, &$output) {
+
+  // Setup the different code and urls for the different projects.
+  $code = array(
+    '111682' => array(
+      'branch' => 'webapp/master',
+      'url' => 'allplayers-mainline'
+     ),
+    '288105' => array(
+      'branch' => 'store/master',
+      'url' => 'apci-store'
+    )
+  );
+
+  $code = $code[$args['project']];
+
   $output = '<html><body>';
   $output .= '<h1>' . $args['title'] . '</h2>';
-
   $dev_stories = array();
 
   // Iterate through the stories.
@@ -30,7 +44,7 @@ function get_output(&$pdf, $args, $stories, &$output) {
   foreach ($dev_stories as $owner => $dstories) {
     $velocities[$owner] = 0;
     foreach ($dstories as $id => $dstory) {
-      $info = shell_exec('git log webapp/master | grep "Merge pull request.*' . $id . '" -B 5');
+      $info = shell_exec('git log ' . $code['branch'] . ' | grep "Merge pull request.*' . $id . '" -B 5');
       $matches = array();
       if ($info) {
         preg_match('/commit ([0-9a-f]+).*Merge pull request \#([0-9]+)/s', $info, $matches);
@@ -42,8 +56,8 @@ function get_output(&$pdf, $args, $stories, &$output) {
       $table .= '<td>' . $owner . '</td>';
       $table .= '<td><a href="https://www.pivotaltracker.com/story/show/' . $id . '">sid-' . $id . '</a>:&nbsp;&nbsp;' . $dstory['name'] . '</td>';
       $table .= '<td>' . $dstory['estimate'] . '</td>';
-      $table .= $sha ? '<td><a target="_blank" href="https://github.com/AllPlayers/allplayers-mainline/commit/' . $sha . '">DIFF</a></td>' : '<td></td>';
-      $table .= $pull ? '<td><a target="_blank" href="https://github.com/AllPlayers/allplayers-mainline/pull/' . $pull . '">PULL</a></td>' : '<td></td>';
+      $table .= $sha ? '<td><a target="_blank" href="https://github.com/AllPlayers/' . $code['url'] . '/commit/' . $sha . '">DIFF</a></td>' : '<td></td>';
+      $table .= $pull ? '<td><a target="_blank" href="https://github.com/AllPlayers/' . $code['url'] . '/pull/' . $pull . '">PULL</a></td>' : '<td></td>';
       $table .= '<td>' . $dstory['story_type'] . '</td>';
       $table .= '</tr>';
     }
