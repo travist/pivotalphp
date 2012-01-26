@@ -31,7 +31,6 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
   $velocities = array();
   foreach ($dev_stories as $owner => $dstories) {
     $velocities[$owner] = 0;
-    $table .= '<table border="2" cellpadding="5">';
     foreach ($dstories as $id => $dstory) {
       $info = shell_exec('git log | grep "Merge pull request.*' . $id . '" -B 5');
       $matches = array();
@@ -51,7 +50,6 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
       $table .= '</tr>';
     }
     $table .= '<tr><td bgcolor="#33FF33">Total Velocity</td><td bgcolor="#33FF33" colspan="4">' . $velocities[$owner] . '</td></tr>';
-    $table .= '</table>';
   }
   $table .= '</table>';
 
