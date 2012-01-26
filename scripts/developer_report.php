@@ -45,8 +45,8 @@ function pdf_contents( &$pdf, $args, $stories, &$output ) {
       $table .= '<td>' . $owner . '</td>';
       $table .= '<td><a href="https://www.pivotaltracker.com/story/show/' . $id . '">sid-' . $id . '</a>:&nbsp;&nbsp;' . $dstory['name'] . '</td>';
       $table .= '<td>' . $dstory['estimate'] . '</td>';
-      $table .= $sha ? '<td><a href="https://github.com/AllPlayers/allplayers-mainline/commit/' . $sha . '">DIFF</a></td>' : '<td></td>';
-      $table .= $pull ? '<td><a href="https://github.com/AllPlayers/allplayers-mainline/pull/' . $pull . '">PULL</a></td>' : '<td></td>';
+      $table .= $sha ? '<td><a target="_blank" href="https://github.com/AllPlayers/allplayers-mainline/commit/' . $sha . '">DIFF</a></td>' : '<td></td>';
+      $table .= $pull ? '<td><a target="_blank" href="https://github.com/AllPlayers/allplayers-mainline/pull/' . $pull . '">PULL</a></td>' : '<td></td>';
       $table .= '<td>' . $dstory['story_type'] . '</td>';
       $table .= '</tr>';
     }
